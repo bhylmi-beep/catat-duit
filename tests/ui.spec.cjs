@@ -78,6 +78,32 @@ async function uji(nama, fn) {
   const teks = (page, sel) => page.locator(sel).first().innerText();
   const db = (page) => page.evaluate(() => JSON.parse(localStorage.getItem('mm.v1')));
 
+  console.log('Pintasan Android');
+  await uji('pintasan Pengeluaran langsung buka form, sekali saja, tanpa mengubah data', async () => {
+    const manifest = JSON.parse(fs.readFileSync(path.join(ROOT, 'manifest.webmanifest'), 'utf8'));
+    assert.equal(manifest.shortcuts[0].name, 'Catat pengeluaran');
+    assert.equal(manifest.shortcuts[0].url, './?aksi=keluar#beranda');
+    const { ctx, page } = await bukaHP('2026-10-29T19:40', dataContoh());
+    const sebelum = await db(page);
+    await page.goto(BASE + '?aksi=keluar#beranda');
+    await page.waitForSelector('.sheet[aria-label="Catat transaksi"]');
+    assert.equal(await page.locator('[data-act="f-jenis"][data-v="keluar"]').getAttribute('aria-pressed'), 'true');
+    assert.equal(new URL(page.url()).searchParams.has('aksi'), false);
+    assert.deepEqual(await db(page), sebelum);
+    await page.click('[data-act="tutup"]');
+    await page.reload();
+    assert.equal(await page.locator('.sheet').count(), 0);
+    await ctx.close();
+  });
+  await uji('pintasan di HP baru tetap mulai dari langkah awal', async () => {
+    const ctx = await browser.newContext(opsiHP), page = await ctx.newPage();
+    await page.goto(BASE + '?aksi=keluar#beranda');
+    await page.waitForSelector('.ob');
+    assert.equal(await page.locator('.sheet').count(), 0);
+    assert.equal(new URL(page.url()).searchParams.has('aksi'), false);
+    await ctx.close();
+  });
+
   console.log('Pertama kali dibuka');
   await uji('onboarding 3 langkah: tanggal 25, kategori bawaan, budget + "udah kepakai"', async () => {
     const { ctx, page } = await bukaHP('2026-10-29T19:40');
@@ -795,6 +821,8 @@ async function uji(nama, fn) {
     await page.reload();
     await page.waitForSelector('.hero');
     assert.match(await teks(page, '.lab'), /Siklus/i);
+    await page.goto(BASE + '?aksi=keluar#beranda');
+    await page.waitForSelector('.sheet[aria-label="Catat transaksi"]');
     await ctx.close();
   });
 

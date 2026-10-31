@@ -320,7 +320,7 @@ textarea.inp{min-height:120px;line-height:1.35}  /* 17px: di bawah 16px iPhone n
 <div id="sheet-root"></div>
 <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 
-<script src="engine.js?v=2026.10.30-4"></script>
+<script src="engine.js?v=2026.10.31-1"></script>
 <script>
 (function () {
   'use strict';
@@ -328,7 +328,8 @@ textarea.inp{min-height:120px;line-height:1.35}  /* 17px: di bawah 16px iPhone n
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const ic = (id) => '<svg class="ic" aria-hidden="true"><use href="#' + id + '"/></svg>';
   const KEY = 'mm.v1', KEY_REV = 'mm.v1.rev', KEY_PRE = 'mm.v1.sebelum-pulih', KEY_RUSAK = 'mm.v1.rusak';
-  const VERSI_DIMINTA = '2026.10.30-4';  // harus sama dengan MM.VERSI_KODE (engine.js) dan VERSI di sw.js
+  const VERSI_DIMINTA = '2026.10.31-1';  // harus sama dengan MM.VERSI_KODE (engine.js) dan VERSI di sw.js
+  const pintasanKeluar = new URLSearchParams(location.search).get('aksi') === 'keluar';
   const LABEL = { jebol: 'Jebol', ngebut: 'Ngebut', agak: 'Agak ngebut', aman: 'Aman' };
   const PILL = { jebol: 'p-over', ngebut: 'p-no', agak: 'p-wait', aman: 'p-ok' };
   const KELAS = { jebol: 's-over', ngebut: 's-no', agak: 's-wait', aman: 's-ok' };
@@ -1382,11 +1383,17 @@ textarea.inp{min-height:120px;line-height:1.35}  /* 17px: di bawah 16px iPhone n
     document.addEventListener('click', (e) => { if (e.target.closest('[data-act="muat-ulang"]')) location.reload(); });
     return;
   }
+  if (pintasanKeluar) {
+    const alamat = new URL(location.href);
+    alamat.searchParams.delete('aksi');  // sekali buka saja: muat ulang nanti kembali ke beranda
+    history.replaceState(history.state, '', alamat.pathname + alamat.search + alamat.hash);
+  }
   db = muat();
   revKu = revDisk();
   try { const pre = salinanPre(); if (pre && hariSejak(pre.waktu) > 7) localStorage.removeItem(KEY_PRE); } catch (e) { /* abaikan */ }
   $('#app').classList.add('awal');
   render();
+  if (pintasanKeluar && db) bukaCatat();
   setTimeout(() => $('#app').classList.remove('awal'), 1500);
   if (db) cekPersisten(true);
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || /^(localhost|127\.0\.0\.1)$/.test(location.hostname))) {
