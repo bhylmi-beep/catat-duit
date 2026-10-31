@@ -1,0 +1,14 @@
+{
+  "name": "catat-duit",
+  "private": true,
+  "description": "Catat Duit — app catat duit di HP (PWA, data cuma di HP, tanpa server)",
+  "scripts": {
+    "start": "node tools/serve-app.mjs",
+    "test": "node tests/engine.test.cjs && node tests/ui.spec.cjs",
+    "test:mesin": "node tests/engine.test.cjs",
+    "ikon": "python3 tools/ikon.py"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
+  }
+}
