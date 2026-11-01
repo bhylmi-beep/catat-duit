@@ -20,8 +20,11 @@ Data cuma di localStorage HP pemakainya. Bahasa UI & komentar kode: Indonesia sa
 ## Tampilan
 
 - Font Poppins (400/500/600/700) + fallback sistem. Teks isi 20px maks, isian ≥ 16px (biar iPhone nggak nge-zoom), tombol ≥ 40px.
-- Latar putih. Warna dari token `:root` yang udah ada — jangan ngarang warna baru.
-  Agak ngebut = oranye `#b45309` (kuning gagal kontras). Jebol = merah `#d92626`.
+- Dua tema: terang (latar putih) & gelap (Atur → Tampilan: Ikuti HP / Terang / Gelap, bawaan ikut HP).
+  Warna **cuma lewat token** `:root` — jangan ngarang warna baru, jangan tulis warna langsung (`#fff`) kecuali di atas ungu/merah.
+  Token gelap ada di **dua blok** (media query + `[data-tema="gelap"]`): ubah satu = ubah dua-duanya.
+  Tes kontras otomatis (tulisan ≥ 4,5:1) wajib lulus di dua tema. Pilihan tema = `mm.v1.tema`, di luar data (nggak ikut cadangan).
+  Agak ngebut = oranye `#b45309` (gelap `#e08a24`; kuning gagal kontras). Jebol = merah `#d92626`.
 - Ikon: SVG garis lewat `<symbol>` + `<use>`. **Nol emoji.**
 - Animasi halus + wajib hormatin `prefers-reduced-motion`. Semua layar dicek di lebar 360px, nol geser samping.
 

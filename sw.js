@@ -4,7 +4,7 @@
    Tiap rilis: naikkan VERSI di bawah (samain dengan MM.VERSI_KODE di engine.js).
    Cache app lain di origin yang sama (mis. repo GitHub Pages lain) nggak disentuh.
    Data keuangan NGGAK lewat sini — itu di localStorage. */
-const VERSI = '2026.11.01-1';
+const VERSI = '2026.11.01-2';
 const AWALAN = 'catat-duit-';
 const CACHE = AWALAN + VERSI;
 const FONT = AWALAN + 'font';

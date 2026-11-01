@@ -19,18 +19,45 @@
 /* ============================================================
    TOKEN — sama dengan RENCANA-App-Money-Manager.html (token Cerberus).
    Oranye #b45309 dari shared.css: isian "agak ngebut" (kuning cuma 2,15:1).
+   Mode gelap = set token kedua di bawah (ikut HP, atau dipaksa dari Atur → Tampilan).
+   Ungu & merah sengaja sama di dua mode: tulisan putih di atasnya tetap ≥ 4,5:1.
    ============================================================ */
 :root{
+  color-scheme:light;
   --font:'Poppins',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   --fs-body:20px; --fs-sm:17px; --fs-xs:14px; --fs-h3:24px; --fs-num:34px;
   --bg:#ffffff; --surface:#f6f7f9; --border:#d9dde3; --border-strong:#c2c8d2;
   --text:#161d27; --muted:#637083; --subtle:#6b7280;
   --accent:#8b3cdd; --accent-text:#681fad; --accent-soft:#f5f1f9;
   --success:#22a050; --success-soft:#e1f5e9; --success-text:#1c7343;
-  --danger:#d92626; --danger-soft:#fbe0e0;
+  --danger:#d92626; --danger-soft:#fbe0e0; --danger-text:#d92626;
   --warning:#8b4f18; --warning-soft:#fdf0c7; --orange:#b45309;
+  --inv-bg:#161d27; --inv-text:#ffffff;  /* toast & tombol terpilih: kebalikan latar */
   --r:4px; --r-sm:2px;
   --safe-t:env(safe-area-inset-top,0px); --safe-b:env(safe-area-inset-bottom,0px);
+}
+/* mode gelap — dua blok isinya sama: (1) HP gelap & nggak dipaksa terang, (2) dipaksa gelap. Ubah satu = ubah dua-duanya */
+@media (prefers-color-scheme: dark){
+  :root:not([data-tema="terang"]){
+    color-scheme:dark;
+    --bg:#121720; --surface:#1c222c; --border:#2d3542; --border-strong:#4a5361;
+    --text:#e9ecf1; --muted:#a0aab8; --subtle:#9aa3b0;
+    --accent-text:#c9a4ff; --accent-soft:#2a2140;
+    --success:#34b864; --success-soft:#15301f; --success-text:#6fd896;
+    --danger-text:#ff8f8f; --danger-soft:#3b1a1a;
+    --warning:#f2bd6b; --warning-soft:#3b2a12; --orange:#e08a24;
+    --inv-bg:#e9ecf1; --inv-text:#121720;
+  }
+}
+:root[data-tema="gelap"]{
+    color-scheme:dark;
+    --bg:#121720; --surface:#1c222c; --border:#2d3542; --border-strong:#4a5361;
+    --text:#e9ecf1; --muted:#a0aab8; --subtle:#9aa3b0;
+    --accent-text:#c9a4ff; --accent-soft:#2a2140;
+    --success:#34b864; --success-soft:#15301f; --success-text:#6fd896;
+    --danger-text:#ff8f8f; --danger-soft:#3b1a1a;
+    --warning:#f2bd6b; --warning-soft:#3b2a12; --orange:#e08a24;
+    --inv-bg:#e9ecf1; --inv-text:#121720;
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -39,6 +66,7 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);fon
      -webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
 body.lock{overflow:hidden}
 button,input,textarea{font:inherit;color:inherit}
+::placeholder{color:var(--muted);opacity:1}
 button{background:none;border:0;padding:0;margin:0;cursor:pointer;touch-action:manipulation;text-align:inherit}
 button[disabled]{cursor:default}
 a{color:var(--accent-text)}
@@ -70,7 +98,7 @@ a{color:var(--accent-text)}
 .pill{display:inline-flex;align-items:center;font-size:var(--fs-xs);font-weight:600;padding:3px 10px;border-radius:999px;white-space:nowrap;line-height:1.5;flex:none}
 .p-ok{background:var(--success-soft);color:var(--success-text)}
 .p-wait{background:var(--warning-soft);color:var(--warning)}
-.p-no{background:#fff;color:var(--danger);box-shadow:inset 0 0 0 1.5px var(--danger)}
+.p-no{background:var(--bg);color:var(--danger-text);box-shadow:inset 0 0 0 1.5px var(--danger)}
 .p-over{background:var(--danger);color:#fff}
 .p-mute{background:var(--surface);color:var(--muted)}
 .p-acc{background:var(--accent-soft);color:var(--accent-text)}
@@ -84,7 +112,7 @@ a{color:var(--accent-text)}
 .pb-mark{position:absolute;top:-5px;bottom:-5px;width:2px;margin-left:-1px;background:var(--text)}
 .pb-big .pb-mark{top:-8px;bottom:-8px}
 .pb-over{position:absolute;right:-1px;top:-1px;bottom:-1px;width:10px;border-radius:0 var(--r-sm) var(--r-sm) 0;
-         background:repeating-linear-gradient(135deg,var(--danger) 0 3px,#fff 3px 5px)}
+         background:repeating-linear-gradient(135deg,var(--danger) 0 3px,var(--bg) 3px 5px)}
 .s-ok .pb-fill{background:var(--success)}
 .s-wait .pb-fill{background:var(--orange)}
 .s-no .pb-fill,.s-over .pb-fill{background:var(--danger)}
@@ -124,7 +152,7 @@ a{color:var(--accent-text)}
 .btn-p[aria-disabled="true"]{opacity:.5}
 .btn-w{width:100%}
 .btn-s{min-height:40px;padding:6px 12px;font-size:var(--fs-xs)}
-.btn-d{color:var(--danger);border-color:var(--danger)}
+.btn-d{color:var(--danger-text);border-color:var(--danger)}
 .warn .btn{margin-top:8px}
 .chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 8px;scrollbar-width:none}
 .chips::-webkit-scrollbar{display:none}
@@ -132,7 +160,8 @@ a{color:var(--accent-text)}
 .chip.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-text)}
 .seg{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--border-strong);border-radius:var(--r);overflow:hidden;font-size:var(--fs-xs);font-weight:600;text-align:center}
 .seg button{padding:8px 4px;min-height:40px;text-align:center}
-.seg .on{background:var(--text);color:#fff}
+.seg .on{background:var(--inv-bg);color:var(--inv-text)}
+.seg.tiga{grid-template-columns:repeat(3,1fr)}
 .swt{display:flex;justify-content:space-between;align-items:center;margin:2px 0 6px}
 .swt .mid{text-align:center}
 .swt .mid b{font-size:var(--fs-sm)}
@@ -185,12 +214,12 @@ a{color:var(--accent-text)}
 
 /* ---------- toast ---------- */
 .toast{position:fixed;left:0;right:0;margin:0 auto;bottom:calc(90px + var(--safe-b));z-index:60;width:calc(100% - 24px);max-width:456px;
-       background:var(--text);color:#fff;border-radius:var(--r);padding:8px 14px;font-size:var(--fs-xs);display:flex;align-items:center;gap:10px;min-height:48px}
+       background:var(--inv-bg);color:var(--inv-text);border-radius:var(--r);padding:8px 14px;font-size:var(--fs-xs);display:flex;align-items:center;gap:10px;min-height:48px}
 .toast[hidden]{display:none}
 .toast > .ic{width:18px;height:18px}
 .toast span{flex:1;min-width:0}
-.toast button{color:#fff;font-weight:600;text-decoration:underline;min-height:40px;flex:none}
-.toast.bad{background:var(--danger)}
+.toast button{color:inherit;font-weight:600;text-decoration:underline;min-height:40px;flex:none}
+.toast.bad{background:var(--danger);color:#fff}
 .sheet-open .toast{bottom:calc(var(--shbot,280px) + 8px)}  /* di atas papan angka, jauh dari tombol kepala lembar */
 
 /* ---------- atur & isian ---------- */
@@ -228,9 +257,9 @@ textarea.inp{min-height:120px;line-height:1.35}  /* 17px: di bawah 16px iPhone n
 .sum2 > div{border:1px solid var(--border);border-radius:var(--r);padding:8px 10px;min-width:0}
 .sum2 b{display:block;font-size:var(--fs-sm);font-variant-numeric:tabular-nums}
 .opt{display:flex;align-items:center;gap:12px;width:100%;padding:12px 0;border-bottom:1px solid var(--border);font-size:var(--fs-sm);min-height:56px}
-.opt .box{width:24px;height:24px;border:1.5px solid var(--muted);border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;flex:none;color:#fff}
+.opt .box{width:24px;height:24px;border:1.5px solid var(--muted);border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;flex:none;color:transparent}  /* centang cuma kelihatan pas dipilih (dulu putih-di-atas-putih: bocor di mode gelap) */
 .opt .box .ic{width:16px;height:16px;stroke-width:2.4}
-.opt.on .box{background:var(--accent);border-color:var(--accent)}
+.opt.on .box{background:var(--accent);border-color:var(--accent);color:#fff}
 .opt.radio .box{border-radius:999px}
 .opt > div{flex:1;min-width:0;line-height:1.3}
 .opt small{display:block;font-size:var(--fs-xs);color:var(--muted)}
@@ -252,6 +281,15 @@ textarea.inp{min-height:120px;line-height:1.35}  /* 17px: di bawah 16px iPhone n
   *,*::before,*::after{animation:none!important;transition:none!important}
 }
 </style>
+<script>
+/* Tema dipasang sebelum body digambar, biar nggak kedip putih. Ikut HP = cukup CSS (tanpa atribut);
+   Terang/Gelap dari Atur = atribut data-tema. Warna bilah status HP disamain sama latar. */
+(() => {
+  let t = null; try { t = localStorage.getItem('mm.v1.tema'); } catch (e) { /* abaikan: ikut HP */ }
+  if (t === 'terang' || t === 'gelap') document.documentElement.setAttribute('data-tema', t);
+  document.querySelector('meta[name="theme-color"]').content = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+})();
+</script>
 </head>
 <body>
 
@@ -320,7 +358,7 @@ textarea.inp{min-height:120px;line-height:1.35}  /* 17px: di bawah 16px iPhone n
 <div id="sheet-root"></div>
 <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 
-<script src="engine.js?v=2026.11.01-1"></script>
+<script src="engine.js?v=2026.11.01-2"></script>
 <script>
 (function () {
   'use strict';
@@ -328,7 +366,7 @@ textarea.inp{min-height:120px;line-height:1.35}  /* 17px: di bawah 16px iPhone n
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const ic = (id) => '<svg class="ic" aria-hidden="true"><use href="#' + id + '"/></svg>';
   const KEY = 'mm.v1', KEY_REV = 'mm.v1.rev', KEY_PRE = 'mm.v1.sebelum-pulih', KEY_RUSAK = 'mm.v1.rusak';
-  const VERSI_DIMINTA = '2026.11.01-1';  // harus sama dengan MM.VERSI_KODE (engine.js) dan VERSI di sw.js
+  const VERSI_DIMINTA = '2026.11.01-2';  // harus sama dengan MM.VERSI_KODE (engine.js) dan VERSI di sw.js
   const pintasanKeluar = new URLSearchParams(location.search).get('aksi') === 'keluar';
   const LABEL = { jebol: 'Jebol', ngebut: 'Ngebut', agak: 'Agak ngebut', aman: 'Aman' };
   const PILL = { jebol: 'p-over', ngebut: 'p-no', agak: 'p-wait', aman: 'p-ok' };
@@ -424,6 +462,23 @@ textarea.inp{min-height:120px;line-height:1.35}  /* 17px: di bawah 16px iPhone n
   window.addEventListener('storage', (e) => {
     if (e.key !== KEY_REV || !db) return;
     if (revDisk() !== revKu) muatUlangDariDisk('Data diperbarui dari jendela lain.');
+  });
+
+  // ---------- tema (Atur → Tampilan): disimpan per HP di luar data, jadi nggak ikut cadangan ----------
+  const KEY_TEMA = 'mm.v1.tema';
+  const bacaTema = () => { try { const t = localStorage.getItem(KEY_TEMA); return t === 'terang' || t === 'gelap' ? t : 'auto'; } catch (e) { return 'auto'; } };
+  let temaKu = bacaTema();
+  function terapkanTema() {
+    const root = document.documentElement;
+    if (temaKu === 'auto') root.removeAttribute('data-tema'); else root.setAttribute('data-tema', temaKu);
+    $('meta[name="theme-color"]').content = getComputedStyle(root).getPropertyValue('--bg').trim();
+  }
+  const hpGelap = window.matchMedia ? matchMedia('(prefers-color-scheme: dark)') : null;
+  if (hpGelap && hpGelap.addEventListener) hpGelap.addEventListener('change', terapkanTema);  // mode gelap HP diganti pas app kebuka
+  window.addEventListener('storage', (e) => {
+    if (e.key !== KEY_TEMA) return;
+    temaKu = bacaTema(); terapkanTema();
+    if (db && rute().name === 'atur' && !lembar) render();
   });
 
   // ---------- pembantu ----------
@@ -657,6 +712,9 @@ textarea.inp{min-height:120px;line-height:1.35}  /* 17px: di bawah 16px iPhone n
     h += '<div class="lab sec">Isi</div>';
     h += setRow('i-tag', 'Kategori', katAktif('keluar').length + ' pengeluaran &middot; ' + katAktif('masuk').length + ' pemasukan', '', 'kategori');
     h += setRow('i-wallet', 'Budget', nB.length + ' budget &middot; total ' + MM.rp(totB), '', 'budget');
+    h += '<div class="lab sec">Tampilan</div><div class="seg tiga" role="group" aria-label="Tampilan" style="margin:8px 0 4px">' +
+      [['auto', 'Ikuti HP'], ['terang', 'Terang'], ['gelap', 'Gelap']].map(([v, n]) =>
+        '<button class="' + (temaKu === v ? 'on' : '') + '" data-act="tema" data-v="' + v + '" aria-pressed="' + (temaKu === v) + '">' + n + '</button>').join('') + '</div>';
     h += '<div class="lab sec">Data</div>';
     h += '<button class="set" data-act="cadangan">' + ic('i-download') + '<div>Simpan cadangan<small>File .json &rarr; Drive / WhatsApp ke diri sendiri</small></div>' +
       (lama == null ? '<span class="pill p-no">Belum pernah</span>' : '<span class="pill ' + (lama >= 7 ? 'p-wait' : 'p-ok') + '">' + (lama === 0 ? 'Hari ini' : lama + ' hari lalu') + '</span>') + '</button>';
@@ -1303,6 +1361,11 @@ textarea.inp{min-height:120px;line-height:1.35}  /* 17px: di bawah 16px iPhone n
       if (!snap) return;
       pilihS = null; kembali('atur');
       toast('Siklus sekarang mulai tiap tanggal ' + v, snap);
+    },
+    'tema': (el) => {
+      temaKu = el.dataset.v;
+      try { if (temaKu === 'auto') localStorage.removeItem(KEY_TEMA); else localStorage.setItem(KEY_TEMA, temaKu); } catch (e) { /* nggak kesimpan: tetap kepakai sampai app ditutup */ }
+      terapkanTema(); render();
     },
     'set-tol': (el) => { const snap = ubah(() => { db.settings.tol = Number(el.dataset.v); }); if (snap) { render(); toast('Toleransi jadi ' + el.dataset.v + ' poin', snap); } },
     'rekap-ok': () => { db.meta.rekap = siklusIni().start; simpan(); render(); },

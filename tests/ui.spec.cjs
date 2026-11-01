@@ -64,8 +64,8 @@ async function uji(nama, fn) {
   browser.newContext = async (o) => { const c = await ctxAsli(o); const np = c.newPage.bind(c); c.newPage = async () => tambal(await np()); return c; };
   const opsiHP = { viewport: { width: 360, height: 780 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, timezoneId: 'Asia/Jakarta', locale: 'id-ID', acceptDownloads: true };
   const errors = [];
-  async function bukaHP(jam, data) {
-    const ctx = await browser.newContext(opsiHP);
+  async function bukaHP(jam, data, opsi) {
+    const ctx = await browser.newContext({ ...opsiHP, ...opsi });
     const page = await ctx.newPage();
     page.on('pageerror', (e) => errors.push(e.message));
     page.on('console', (m) => { if (m.type() === 'error' && !/fonts\.(googleapis|gstatic)|ERR_INTERNET|net::/.test(m.text())) errors.push(m.text()); });
@@ -786,6 +786,112 @@ async function uji(nama, fn) {
     assert.ok(keys.includes('app-lain-v1'), 'cache app lain ikut kehapus: ' + keys);
     assert.ok(keys.some((k) => /^catat-duit-\d{4}\./.test(k)), 'cache versi sekarang nggak ada: ' + keys);
     await ctx.close();
+  });
+
+  console.log('Mode gelap');
+  const latar = (page) => page.evaluate(() => [getComputedStyle(document.body).backgroundColor, document.querySelector('meta[name="theme-color"]').content, getComputedStyle(document.documentElement).colorScheme]);
+  const GELAP = ['rgb(18, 23, 32)', '#121720', 'dark'], TERANG = ['rgb(255, 255, 255)', '#ffffff', 'light'];
+  /** sesudah mode HP diganti: Chrome ngabarin app (event 'change') di frame berikutnya, jadi bilah status nyusul ±1 frame */
+  const latarJadi = async (page, harap) => {
+    for (let i = 0; i < 40; i++) { if (JSON.stringify(await latar(page)) === JSON.stringify(harap)) return; await page.waitForTimeout(50); }
+    assert.deepEqual(await latar(page), harap);
+  };
+  await uji('ikut HP: HP gelap → app gelap, HP terang → putih; bilah status ikut; ganti mode HP pas app kebuka langsung ikut', async () => {
+    const { ctx, page } = await bukaHP('2026-10-29T19:40', dataContoh(), { colorScheme: 'dark' });
+    assert.deepEqual(await latar(page), GELAP);
+    await page.emulateMedia({ colorScheme: 'light' });
+    await latarJadi(page, TERANG);
+    await ctx.close();
+    const t = await bukaHP('2026-10-29T19:40', dataContoh(), { colorScheme: 'light' });
+    assert.deepEqual(await latar(t.page), TERANG);
+    await t.ctx.close();
+  });
+  await uji('Atur → Tampilan: Gelap/Terang menang atas HP, Ikuti HP balik; kepasang sebelum body digambar; di luar data; jendela lain ikut', async () => {
+    const { ctx, page } = await bukaHP('2026-10-29T19:40', dataContoh(), { colorScheme: 'light' });
+    const sebelum = await db(page), tombol = (v) => page.locator('[data-act="tema"][data-v="' + v + '"]').getAttribute('aria-pressed');
+    await page.goto(BASE + '#atur');
+    assert.equal(await tombol('auto'), 'true');
+    await page.click('[data-act="tema"][data-v="gelap"]');
+    assert.deepEqual(await latar(page), GELAP);
+    assert.equal(await tombol('gelap'), 'true');
+    assert.equal(await page.evaluate(() => localStorage.getItem('mm.v1.tema')), 'gelap');
+    assert.deepEqual(await db(page), sebelum, 'pilihan tampilan nggak boleh ngubah data (cadangan)');
+    // dibuka ulang: tema udah kepasang pas <body> baru mulai dibikin, sebelum ada yang digambar (nggak kedip putih)
+    await page.addInitScript(() => new MutationObserver((m, o) => { if (document.body) { o.disconnect(); window.__awal = [document.documentElement.getAttribute('data-tema'), getComputedStyle(document.documentElement).backgroundColor]; } }).observe(document, { childList: true, subtree: true }));
+    await page.reload(); await page.waitForSelector('#view > *');
+    assert.deepEqual(await page.evaluate(() => window.__awal), ['gelap', 'rgb(18, 23, 32)']);
+    // jendela kedua (Android: tab Chrome + app terpasang) ikut berubah tanpa dimuat ulang
+    const kedua = await ctx.newPage(); await kedua.goto(BASE + '#atur'); await kedua.waitForSelector('#view > *');
+    assert.deepEqual(await latar(kedua), GELAP);
+    await page.click('[data-act="tema"][data-v="auto"]');
+    await kedua.waitForFunction(() => !document.documentElement.hasAttribute('data-tema'));
+    assert.deepEqual(await latar(kedua), TERANG);
+    assert.equal(await kedua.locator('[data-act="tema"][data-v="auto"]').getAttribute('aria-pressed'), 'true');
+    assert.equal(await page.evaluate(() => localStorage.getItem('mm.v1.tema')), null);
+    // kotak centang Toleransi di mode gelap: yang nggak dipilih kosong (dulu centang putih "disembunyiin" di latar putih)
+    await page.click('[data-act="tema"][data-v="gelap"]'); await page.goto(BASE + '#toleransi');
+    assert.deepEqual(await page.evaluate(() => [...document.querySelectorAll('.opt .box')].map((b) => getComputedStyle(b).color)),
+      ['rgba(0, 0, 0, 0)', 'rgb(255, 255, 255)', 'rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0)']);
+    await page.goto(BASE + '#atur'); await page.click('[data-act="tema"][data-v="auto"]');
+    // HP gelap: Ikuti HP = gelap, dipaksa Terang = putih
+    await page.emulateMedia({ colorScheme: 'dark' });
+    await latarJadi(page, GELAP);
+    await page.click('[data-act="tema"][data-v="terang"]');
+    assert.deepEqual(await latar(page), TERANG);
+    await ctx.close();
+  });
+  /** semua tulisan yang kelihatan: kontras warna teks vs latar yang beneran ada di bawahnya (lapisan transparan ikut dihitung) */
+  const kontras = (page) => page.evaluate(() => {
+    const rgba = (c) => { const m = /rgba?\(([^)]+)\)/.exec(c); if (!m) return null; const p = m[1].split(/[\s,/]+/).filter(Boolean).map(Number); return [p[0], p[1], p[2], p.length > 3 ? p[3] : 1]; };
+    const lum = (c) => { const f = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }; return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]); };
+    const latarDi = (el) => {
+      const lapis = [];
+      for (let e = el; e; e = e.parentElement) {
+        const st = getComputedStyle(e);
+        if (st.backgroundImage !== 'none') return null;  // arsiran/gradasi: nggak ada tulisan di situ
+        const c = rgba(st.backgroundColor);
+        if (c && c[3] > 0) { lapis.push(c); if (c[3] >= 1) break; }
+      }
+      let out = [255, 255, 255];
+      for (let i = lapis.length - 1; i >= 0; i--) { const [r, g, b, a] = lapis[i]; out = [r * a + out[0] * (1 - a), g * a + out[1] * (1 - a), b * a + out[2] * (1 - a)]; }
+      return out;
+    };
+    const gagal = [];
+    document.querySelectorAll('body *').forEach((el) => {
+      if (![...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim())) return;
+      if (!el.getClientRects().length || el.closest('[aria-hidden="true"], [disabled], [aria-disabled="true"], svg')) return;
+      const st = getComputedStyle(el);
+      if (st.visibility === 'hidden') return;
+      for (let e = el; e; e = e.parentElement) if (parseFloat(getComputedStyle(e).opacity) < 1) return;  // tombol mati sengaja dipudarin
+      const bg = latarDi(el), fg = rgba(st.color);
+      if (!bg || !fg) return;
+      const warna = [0, 1, 2].map((i) => fg[i] * fg[3] + bg[i] * (1 - fg[3]));
+      const [x, y] = [lum(warna), lum(bg)].sort((p, q) => q - p), r = (x + 0.05) / (y + 0.05);
+      const fs = parseFloat(st.fontSize), besar = fs >= 24 || (fs >= 18.66 && Number(st.fontWeight) >= 700);
+      if (r < (besar ? 3 : 4.5)) gagal.push((el.className || el.tagName) + ' "' + el.textContent.trim().slice(0, 20) + '" ' + r.toFixed(2));
+    });
+    return gagal;
+  });
+  await uji('kontras tulisan di semua layar ≥ 4,5:1 (tulisan besar 3:1), mode terang & gelap', async () => {
+    for (const mode of ['light', 'dark']) {
+      const { ctx, page } = await bukaHP('2026-10-29T19:40', dataContoh(), { colorScheme: mode });
+      const cek = async (nama) => assert.deepEqual(await kontras(page), [], mode + ' · ' + nama);
+      for (const v of ['beranda', 'riwayat', 'laporan', 'atur', 'mulai', 'toleransi', 'kategori', 'budget', 'detail/b-makan']) { await page.goto(BASE + '#' + v); await page.waitForSelector('#view > *'); await cek(v); }
+      await page.goto(BASE + '#atur'); await page.click('[data-act="tema"][data-v="' + (mode === 'dark' ? 'gelap' : 'terang') + '"]'); await cek('atur, tampilan dipilih');
+      await page.evaluate(() => { const d = JSON.parse(localStorage.getItem('mm.v1')); d.settings.lastBackup = '2026-10-10T10:00'; localStorage.setItem('mm.v1', JSON.stringify(d)); });
+      await page.goto(BASE + '#beranda'); await page.reload(); await page.waitForSelector('.hero'); await cek('beranda + spanduk cadangan');
+      await page.click('[data-act="catat"]'); await page.waitForTimeout(300);
+      for (const k of ['3', '5', '000']) await page.click('[data-act="f-key"][data-k="' + k + '"]');
+      await page.click('[data-act="f-kat"][data-id="makan"]'); await page.click('[data-act="f-waktu"]'); await cek('catat');
+      await page.click('#f-save'); await page.waitForSelector('#toast:not([hidden])'); await cek('toast urungkan');
+      await page.goto(BASE + '#atur'); await page.click('[data-act="pulihkan"]'); await page.waitForTimeout(300); await cek('pulihkan'); await page.click('[data-act="tutup"]');
+      await page.goto(BASE + '#budget'); await page.click('[data-act="edit-budget"][data-kat="sehat"]'); await page.waitForTimeout(300); await cek('lembar budget'); await page.click('[data-act="tutup"]');
+      await page.goto(BASE + '#kategori'); await page.click('[data-act="kat-baru"]'); await page.waitForTimeout(300); await cek('lembar kategori'); await page.click('[data-act="tutup"]');
+      await page.evaluate(() => { localStorage.removeItem('mm.v1'); sessionStorage.setItem('diisi', '1'); });
+      await page.reload(); await page.waitForSelector('.ob');
+      await cek('langkah awal 1'); await page.click('[data-act="ob-next"]'); await cek('langkah awal 2'); await page.click('[data-act="ob-next"]'); await cek('langkah awal 3');
+      await ctx.close();
+    }
   });
 
   console.log('Tampilan HP');

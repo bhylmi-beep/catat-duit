@@ -9,7 +9,7 @@ Aturan buat agen AI yang ngerjain repo ini: `AGENTS.md`.
 | Langkah | Isi | Status |
 |---|---|---|
 | 1 | Mesin hitung + tes otomatis | **jadi** — 48 tes lulus, sama hasilnya di 4 zona waktu |
-| 2 | Layar inti di lebar HP | **jadi** — 48 tes alur lulus (360–412 px) |
+| 2 | Layar inti di lebar HP | **jadi** — 51 tes alur lulus (360–412 px) |
 | — | Kategori spesifik buat budget (permintaan Bay 30 Okt) | **jadi** — 15 saran tinggal centang + tulis sendiri, di langkah awal & layar Budget |
 | — | Review independen 3 sudut (hitungan, HP/UX, keamanan data) | **beres** — 21 temuan, semua dibetulin + dikasih tes |
 | 3 | Jadi app di HP lu (hosting https + pasang ke layar utama) | **online** di `https://bhylmi-beep.github.io/catat-duit/`; pemasangan dan cek di HP Bay belum diverifikasi |
@@ -60,7 +60,7 @@ Buat ngetes tanggal tertentu tanpa nunggu: tambah `?jam=2026-11-24T23:59` di ala
 | `.nojekyll` | Biar GitHub Pages nyajiin berkas apa adanya |
 | `AGENTS.md` | Aturan buat agen AI (versi, tes, logika yang nggak boleh diubah diam-diam) |
 | `tests/engine.test.cjs` | 48 tes mesin hitung |
-| `tests/ui.spec.cjs` | 48 tes alur di HP pakai jam palsu (Playwright + Chrome) |
+| `tests/ui.spec.cjs` | 51 tes alur di HP pakai jam palsu (Playwright + Chrome) |
 
 **Tiap rilis:** naikkan versi di tiga tempat sekaligus — `VERSI_KODE` di `engine.js`, `VERSI_DIMINTA` + `engine.js?v=` di
 `index.html`, dan `VERSI` di `sw.js`. Kalau beda, app nolak jalan dan minta muat ulang (sengaja, biar nggak setengah-setengah).
@@ -130,6 +130,13 @@ GitHub Pages di `<akun>.github.io/<repo>` **berbagi satu alamat (origin) dengan 
 app lain di akun yang sama bisa baca atau bahkan ngapus data duit di HP. Dicek 30 Okt 2026: akun `bhylmi-beep`
 belum punya satu pun situs Pages, jadi aman. **Aturannya: jangan nyalain Pages di repo lain akun ini.**
 Kalau suatu hari perlu, pindahin Catat Duit dulu ke rumah sendiri (organisasi GitHub / Netlify) lewat cadangan → pulihkan.
+
+## Mode gelap (1 Nov)
+
+**Atur → Tampilan:** Ikuti HP (bawaan) · Terang · Gelap. "Ikuti HP" = ikut mode gelap Android, termasuk kalau diganti pas app kebuka.
+Tema kepasang di `<head>` sebelum layar digambar, jadi nggak kedip putih; warna bilah status HP ikut.
+Pilihan disimpan di `mm.v1.tema` (di luar data, nggak ikut cadangan). Semua tulisan dicek otomatis kontrasnya ≥ 4,5:1 di dua mode.
+Batasan: layar logo pas app baru dibuka (splash Android) tetap putih — warnanya diambil dari manifest, yang nggak bisa ikut mode gelap.
 
 ## Kategori spesifik
 
