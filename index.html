@@ -20,7 +20,8 @@
    TOKEN — sama dengan RENCANA-App-Money-Manager.html (token Cerberus).
    Oranye #b45309 dari shared.css: isian "agak ngebut" (kuning cuma 2,15:1).
    Mode gelap = set token kedua di bawah (ikut HP, atau dipaksa dari Atur → Tampilan).
-   Ungu & merah sengaja sama di dua mode: tulisan putih di atasnya tetap ≥ 4,5:1.
+   Aksen = hijau tua #00803F (sekeluarga Grab; hijau Grab/Gojek asli cuma 2,8–3,1:1 buat tulisan putih).
+   Hijau aksen & merah sengaja sama di dua mode: tulisan putih di atasnya tetap ≥ 4,5:1.
    ============================================================ */
 :root{
   color-scheme:light;
@@ -28,7 +29,7 @@
   --fs-body:20px; --fs-sm:17px; --fs-xs:14px; --fs-h3:24px; --fs-num:34px;
   --bg:#ffffff; --surface:#f6f7f9; --border:#d9dde3; --border-strong:#c2c8d2;
   --text:#161d27; --muted:#637083; --subtle:#6b7280;
-  --accent:#8b3cdd; --accent-text:#681fad; --accent-soft:#f5f1f9;
+  --accent:#00803F; --accent-text:#006634; --accent-soft:#e3f4ea;
   --success:#22a050; --success-soft:#e1f5e9; --success-text:#1c7343;
   --danger:#d92626; --danger-soft:#fbe0e0; --danger-text:#d92626;
   --warning:#8b4f18; --warning-soft:#fdf0c7; --orange:#b45309;
@@ -42,7 +43,7 @@
     color-scheme:dark;
     --bg:#121720; --surface:#1c222c; --border:#2d3542; --border-strong:#4a5361;
     --text:#e9ecf1; --muted:#a0aab8; --subtle:#9aa3b0;
-    --accent-text:#c9a4ff; --accent-soft:#2a2140;
+    --accent-text:#5fdc98; --accent-soft:#123222;
     --success:#34b864; --success-soft:#15301f; --success-text:#6fd896;
     --danger-text:#ff8f8f; --danger-soft:#3b1a1a;
     --warning:#f2bd6b; --warning-soft:#3b2a12; --orange:#e08a24;
@@ -53,7 +54,7 @@
     color-scheme:dark;
     --bg:#121720; --surface:#1c222c; --border:#2d3542; --border-strong:#4a5361;
     --text:#e9ecf1; --muted:#a0aab8; --subtle:#9aa3b0;
-    --accent-text:#c9a4ff; --accent-soft:#2a2140;
+    --accent-text:#5fdc98; --accent-soft:#123222;
     --success:#34b864; --success-soft:#15301f; --success-text:#6fd896;
     --danger-text:#ff8f8f; --danger-soft:#3b1a1a;
     --warning:#f2bd6b; --warning-soft:#3b2a12; --orange:#e08a24;
@@ -358,7 +359,7 @@ textarea.inp{min-height:120px;line-height:1.35}  /* 17px: di bawah 16px iPhone n
 <div id="sheet-root"></div>
 <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 
-<script src="engine.js?v=2026.11.01-2"></script>
+<script src="engine.js?v=2026.11.01-3"></script>
 <script>
 (function () {
   'use strict';
@@ -366,7 +367,7 @@ textarea.inp{min-height:120px;line-height:1.35}  /* 17px: di bawah 16px iPhone n
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const ic = (id) => '<svg class="ic" aria-hidden="true"><use href="#' + id + '"/></svg>';
   const KEY = 'mm.v1', KEY_REV = 'mm.v1.rev', KEY_PRE = 'mm.v1.sebelum-pulih', KEY_RUSAK = 'mm.v1.rusak';
-  const VERSI_DIMINTA = '2026.11.01-2';  // harus sama dengan MM.VERSI_KODE (engine.js) dan VERSI di sw.js
+  const VERSI_DIMINTA = '2026.11.01-3';  // harus sama dengan MM.VERSI_KODE (engine.js) dan VERSI di sw.js
   const pintasanKeluar = new URLSearchParams(location.search).get('aksi') === 'keluar';
   const LABEL = { jebol: 'Jebol', ngebut: 'Ngebut', agak: 'Agak ngebut', aman: 'Aman' };
   const PILL = { jebol: 'p-over', ngebut: 'p-no', agak: 'p-wait', aman: 'p-ok' };

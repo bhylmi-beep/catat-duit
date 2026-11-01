@@ -119,7 +119,7 @@ Rumahnya: GitHub Pages di akun pribadi Bay → `https://bhylmi-beep.github.io/ca
 Pintasan ini langsung membuka form pengeluaran; ini menu pintasan app, bukan widget Android
 (widget beneran cuma bisa dibikin app asli Play Store, web app nggak bisa).
 **Jadiin tombol di layar utama (1 Nov):** tekan lama ikon Catat Duit → tahan **Catat pengeluaran** → seret ke layar utama.
-Hasilnya ikon **Pengeluaran** sendiri (ungu, tanda + putih: `ikon-pintasan-keluar.png`, dibikin `tools/ikon.py`).
+Hasilnya ikon **Pengeluaran** sendiri (hijau, tanda + putih: `ikon-pintasan-keluar.png`, dibikin `tools/ikon.py`).
 Dibuka dari situ, layar pertama yang kelihatan langsung form, tanpa animasi masuk (beranda nggak sempat ngintip);
 tombol + di dalam app tetap pakai animasi biasa.
 Tautan langsungnya: `https://bhylmi-beep.github.io/catat-duit/?aksi=keluar#beranda`.

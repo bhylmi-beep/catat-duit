@@ -1,6 +1,6 @@
-"""Bikin ikon PNG Catat Duit tanpa library luar: latar ungu #8b3cdd + batang budget dengan garis "hari ini".
+"""Bikin ikon PNG Catat Duit tanpa library luar: latar hijau #00803F (aksen app) + batang budget dengan garis "hari ini".
 
-Plus ikon pintasan "Catat pengeluaran" (latar ungu + tanda tambah putih, sama kayak tombol + di app) biar ikonnya
+Plus ikon pintasan "Catat pengeluaran" (latar hijau + tanda tambah putih, sama kayak tombol + di app) biar ikonnya
 di layar utama Android beda dari ikon app.
 
 Jalankan dari folder app:  python3 tools/ikon.py
@@ -11,7 +11,7 @@ import struct
 import zlib
 from pathlib import Path
 
-UNGU = (0x8B, 0x3C, 0xDD)
+HIJAU = (0x00, 0x80, 0x3F)  # sama dengan --accent di index.html (dicek tes)
 PUTIH = (0xFF, 0xFF, 0xFF)
 GELAP = (0x16, 0x1D, 0x27)
 SS = 4  # supersampling per sisi
@@ -44,8 +44,8 @@ def piksel(n, u, v, skala):
     if dalam_pil(u, v, x0, x1, cy, h):
         if u <= isi or dalam_pil(u, v, x0, isi, cy, h):
             return PUTIH
-        return campur(UNGU, PUTIH, 0.32)
-    return UNGU
+        return campur(HIJAU, PUTIH, 0.32)
+    return HIJAU
 
 
 def piksel_tambah(n, u, v, skala):
@@ -53,7 +53,7 @@ def piksel_tambah(n, u, v, skala):
     h = 0.24 * skala
     if dalam_pil(u, v, 0.5 - skala / 2, 0.5 + skala / 2, 0.5, h) or dalam_pil(v, u, 0.5 - skala / 2, 0.5 + skala / 2, 0.5, h):
         return PUTIH
-    return UNGU
+    return HIJAU
 
 
 def gambar(n, skala, fn=piksel):

@@ -21,7 +21,8 @@ Data cuma di localStorage HP pemakainya. Bahasa UI & komentar kode: Indonesia sa
 
 - Font Poppins (400/500/600/700) + fallback sistem. Teks isi 20px maks, isian ≥ 16px (biar iPhone nggak nge-zoom), tombol ≥ 40px.
 - Dua tema: terang (latar putih) & gelap (Atur → Tampilan: Ikuti HP / Terang / Gelap, bawaan ikut HP).
-  Warna **cuma lewat token** `:root` — jangan ngarang warna baru, jangan tulis warna langsung (`#fff`) kecuali di atas ungu/merah.
+  Warna **cuma lewat token** `:root` — jangan ngarang warna baru, jangan tulis warna langsung (`#fff`) kecuali di atas hijau aksen/merah.
+  Aksen = hijau tua `#00803F` (ikon PNG ikut warna ini; hijau Grab/Gojek asli gagal kontras buat tulisan putih).
   Token gelap ada di **dua blok** (media query + `[data-tema="gelap"]`): ubah satu = ubah dua-duanya.
   Tes kontras otomatis (tulisan ≥ 4,5:1) wajib lulus di dua tema. Pilihan tema = `mm.v1.tema`, di luar data (nggak ikut cadangan).
   Agak ngebut = oranye `#b45309` (gelap `#e08a24`; kuning gagal kontras). Jebol = merah `#d92626`.

@@ -137,6 +137,14 @@ async function uji(nama, fn) {
     }
     assert.ok(putih > 1000, 'tanda + kelihatan');
     assert.equal(putihLuar, 0);
+    // latar ikon app & pintasan = warna aksen app (--accent). Ganti aksen tanpa `npm run ikon` = ketahuan di sini
+    const aksen = /--accent:#([0-9a-fA-F]{6})/.exec(fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8'))[1].toLowerCase();
+    for (const f of ['ikon-192.png', 'ikon-512.png', 'ikon-maskable-512.png', 'apple-touch-icon.png', 'ikon-pintasan-keluar.png']) {
+      const png = fs.readFileSync(path.join(ROOT, f)), dat = [];
+      for (let o = 8; o < png.length;) { const n = png.readUInt32BE(o); if (png.toString('latin1', o + 4, o + 8) === 'IDAT') dat.push(png.subarray(o + 8, o + 8 + n)); o += 12 + n; }
+      const px = require('node:zlib').inflateSync(Buffer.concat(dat)).subarray(1, 4);  // piksel pojok kiri atas (lewati byte filter)
+      assert.equal(px.toString('hex'), aksen, f + ': latar ikon beda dari --accent');
+    }
   });
 
   console.log('Pertama kali dibuka');
