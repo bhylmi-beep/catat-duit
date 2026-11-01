@@ -1,7 +1,11 @@
 """Bikin ikon PNG Catat Duit tanpa library luar: latar ungu #8b3cdd + batang budget dengan garis "hari ini".
 
+Plus ikon pintasan "Catat pengeluaran" (latar ungu + tanda tambah putih, sama kayak tombol + di app) biar ikonnya
+di layar utama Android beda dari ikon app.
+
 Jalankan dari folder app:  python3 tools/ikon.py
-Hasil ditulis ke folder app (satu tingkat di atas berkas ini): ikon-192.png, ikon-512.png, ikon-maskable-512.png, apple-touch-icon.png
+Hasil ditulis ke folder app (satu tingkat di atas berkas ini): ikon-192.png, ikon-512.png, ikon-maskable-512.png, apple-touch-icon.png,
+ikon-pintasan-keluar.png
 """
 import struct
 import zlib
@@ -44,7 +48,15 @@ def piksel(n, u, v, skala):
     return UNGU
 
 
-def gambar(n, skala):
+def piksel_tambah(n, u, v, skala):
+    """tanda tambah putih berujung bulat di tengah; skala = panjang lengan relatif kanvas (muat di zona aman ikon bundar)"""
+    h = 0.24 * skala
+    if dalam_pil(u, v, 0.5 - skala / 2, 0.5 + skala / 2, 0.5, h) or dalam_pil(v, u, 0.5 - skala / 2, 0.5 + skala / 2, 0.5, h):
+        return PUTIH
+    return UNGU
+
+
+def gambar(n, skala, fn=piksel):
     baris = bytearray()
     for py in range(n):
         baris.append(0)  # filter: none
@@ -52,7 +64,7 @@ def gambar(n, skala):
             acc = [0, 0, 0]
             for sy in range(SS):
                 for sx in range(SS):
-                    c = piksel(n, (px + (sx + 0.5) / SS) / n, (py + (sy + 0.5) / SS) / n, skala)
+                    c = fn(n, (px + (sx + 0.5) / SS) / n, (py + (sy + 0.5) / SS) / n, skala)
                     acc[0] += c[0]; acc[1] += c[1]; acc[2] += c[2]
             baris.extend(round(a / (SS * SS)) for a in acc)
     return bytes(baris)
@@ -71,6 +83,8 @@ def main():
                            ('ikon-maskable-512.png', 512, 0.66), ('apple-touch-icon.png', 180, 0.86)]:
         (out / nama).write_bytes(png(n, gambar(n, skala)))
         print('ditulis', nama, n, 'px')
+    (out / 'ikon-pintasan-keluar.png').write_bytes(png(192, gambar(192, 0.46, piksel_tambah)))
+    print('ditulis ikon-pintasan-keluar.png 192 px')
 
 
 if __name__ == '__main__':

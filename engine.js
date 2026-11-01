@@ -179,7 +179,7 @@
 
   // ---------- data ----------
   const VERSI = 1;               // versi bentuk data (cadangan)
-  const VERSI_KODE = '2026.10.31-1';  // wajib sama dengan yang diminta index.html, biar nggak kecampur versi pas update
+  const VERSI_KODE = '2026.11.01-1';  // wajib sama dengan yang diminta index.html, biar nggak kecampur versi pas update
   /** 'YYYY-MM-DD' yang tanggalnya beneran ada di kalender (nolak 2026-10-32, 2027-02-29) */
   function tanggalAsli(s) {
     const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(s));

@@ -4,12 +4,12 @@ Catat pengeluaran satu tangan. Batang budgetnya ikut jalan sama tanggal, jadi ka
 ketahuan dari minggu pertama. Rencana lengkap + alasan tiap keputusan ada di dokumen rencana (`RENCANA-App-Money-Manager.html`, di luar repo ini).
 Aturan buat agen AI yang ngerjain repo ini: `AGENTS.md`.
 
-## Status (31 Oktober 2026)
+## Status (1 November 2026)
 
 | Langkah | Isi | Status |
 |---|---|---|
 | 1 | Mesin hitung + tes otomatis | **jadi** — 48 tes lulus, sama hasilnya di 4 zona waktu |
-| 2 | Layar inti di lebar HP | **jadi** — 46 tes alur lulus (360–412 px) |
+| 2 | Layar inti di lebar HP | **jadi** — 48 tes alur lulus (360–412 px) |
 | — | Kategori spesifik buat budget (permintaan Bay 30 Okt) | **jadi** — 15 saran tinggal centang + tulis sendiri, di langkah awal & layar Budget |
 | — | Review independen 3 sudut (hitungan, HP/UX, keamanan data) | **beres** — 21 temuan, semua dibetulin + dikasih tes |
 | 3 | Jadi app di HP lu (hosting https + pasang ke layar utama) | **online** di `https://bhylmi-beep.github.io/catat-duit/`; pemasangan dan cek di HP Bay belum diverifikasi |
@@ -60,7 +60,7 @@ Buat ngetes tanggal tertentu tanpa nunggu: tambah `?jam=2026-11-24T23:59` di ala
 | `.nojekyll` | Biar GitHub Pages nyajiin berkas apa adanya |
 | `AGENTS.md` | Aturan buat agen AI (versi, tes, logika yang nggak boleh diubah diam-diam) |
 | `tests/engine.test.cjs` | 48 tes mesin hitung |
-| `tests/ui.spec.cjs` | 46 tes alur di HP pakai jam palsu (Playwright + Chrome) |
+| `tests/ui.spec.cjs` | 48 tes alur di HP pakai jam palsu (Playwright + Chrome) |
 
 **Tiap rilis:** naikkan versi di tiga tempat sekaligus — `VERSI_KODE` di `engine.js`, `VERSI_DIMINTA` + `engine.js?v=` di
 `index.html`, dan `VERSI` di `sw.js`. Kalau beda, app nolak jalan dan minta muat ulang (sengaja, biar nggak setengah-setengah).
@@ -116,7 +116,12 @@ npm run test:mesin
 Rumahnya: GitHub Pages di akun pribadi Bay → `https://bhylmi-beep.github.io/catat-duit/` (repo publik, data tetap di HP).
 
 **Pintasan Android:** setelah app terpasang lewat Chrome, tekan lama ikon Catat Duit → **Catat pengeluaran**.
-Pintasan ini langsung membuka form pengeluaran; ini menu pintasan app, bukan widget Android.
+Pintasan ini langsung membuka form pengeluaran; ini menu pintasan app, bukan widget Android
+(widget beneran cuma bisa dibikin app asli Play Store, web app nggak bisa).
+**Jadiin tombol di layar utama (1 Nov):** tekan lama ikon Catat Duit → tahan **Catat pengeluaran** → seret ke layar utama.
+Hasilnya ikon **Pengeluaran** sendiri (ungu, tanda + putih: `ikon-pintasan-keluar.png`, dibikin `tools/ikon.py`).
+Dibuka dari situ, layar pertama yang kelihatan langsung form, tanpa animasi masuk (beranda nggak sempat ngintip);
+tombol + di dalam app tetap pakai animasi biasa.
 Tautan langsungnya: `https://bhylmi-beep.github.io/catat-duit/?aksi=keluar#beranda`.
 Kalau app sudah terpasang sebelum pintasan dirilis, Chrome bisa butuh waktu untuk memperbarui menu pintasan.
 Jangan hapus app hanya untuk memaksa pembaruan sebelum cadangan data aman.

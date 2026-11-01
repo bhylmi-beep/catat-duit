@@ -15,7 +15,10 @@
       "short_name": "Pengeluaran",
       "description": "Langsung buka form pengeluaran.",
       "url": "./?aksi=keluar#beranda",
-      "icons": [{ "src": "ikon-192.png", "sizes": "192x192", "type": "image/png" }]
+      "icons": [
+        { "src": "ikon-pintasan-keluar.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+        { "src": "ikon-pintasan-keluar.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" }
+      ]
     }
   ],
   "icons": [

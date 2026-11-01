@@ -320,7 +320,7 @@ textarea.inp{min-height:120px;line-height:1.35}  /* 17px: di bawah 16px iPhone n
 <div id="sheet-root"></div>
 <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 
-<script src="engine.js?v=2026.10.31-1"></script>
+<script src="engine.js?v=2026.11.01-1"></script>
 <script>
 (function () {
   'use strict';
@@ -328,7 +328,7 @@ textarea.inp{min-height:120px;line-height:1.35}  /* 17px: di bawah 16px iPhone n
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const ic = (id) => '<svg class="ic" aria-hidden="true"><use href="#' + id + '"/></svg>';
   const KEY = 'mm.v1', KEY_REV = 'mm.v1.rev', KEY_PRE = 'mm.v1.sebelum-pulih', KEY_RUSAK = 'mm.v1.rusak';
-  const VERSI_DIMINTA = '2026.10.31-1';  // harus sama dengan MM.VERSI_KODE (engine.js) dan VERSI di sw.js
+  const VERSI_DIMINTA = '2026.11.01-1';  // harus sama dengan MM.VERSI_KODE (engine.js) dan VERSI di sw.js
   const pintasanKeluar = new URLSearchParams(location.search).get('aksi') === 'keluar';
   const LABEL = { jebol: 'Jebol', ngebut: 'Ngebut', agak: 'Agak ngebut', aman: 'Aman' };
   const PILL = { jebol: 'p-over', ngebut: 'p-no', agak: 'p-wait', aman: 'p-ok' };
@@ -828,7 +828,7 @@ textarea.inp{min-height:120px;line-height:1.35}  /* 17px: di bawah 16px iPhone n
       const t = o.tx;
       Object.assign(form, { id: t.id, jenis: t.jenis, digits: String(t.nominal), kat: t.kat, tgl: t.waktu.slice(0, 10), jam: t.waktu.slice(11, 16), catatan: t.catatan || '' });
     }
-    bukaLembar('catat');
+    bukaLembar('catat', !!(o && o.langsung));
   }
   const formOk = () => Number(form.digits || 0) > 0 && !!form.kat;
   function lCatat() {
@@ -1092,7 +1092,7 @@ textarea.inp{min-height:120px;line-height:1.35}  /* 17px: di bawah 16px iPhone n
   let lembar = null, didorong = false, abaikanPop = false, sesudahPop = null, pembuka = null, tsTutup = -1e9;
   const LEMBAR = { catat: lCatat, kat: lKat, budget: lBudget, pulih: lPulih };
   const NAMA_LEMBAR = { catat: 'Catat transaksi', kat: 'Kategori', budget: 'Atur budget', pulih: 'Pulihkan cadangan' };
-  function bukaLembar(nama) {
+  function bukaLembar(nama, langsung) {
     const tadi = !!lembar;
     if (!tadi) {
       pembuka = document.activeElement;
@@ -1100,15 +1100,16 @@ textarea.inp{min-height:120px;line-height:1.35}  /* 17px: di bawah 16px iPhone n
       history.pushState({ lembar: 1 }, ''); didorong = true;
     }
     lembar = nama;
-    gambarLembar(!tadi);
+    gambarLembar(!tadi, langsung);
   }
-  /** gambar ulang lembar. buka=true cuma pas baru dibuka: animasi masuk + fokus pindah ke dalam */
-  function gambarLembar(buka) {
+  /** gambar ulang lembar. buka=true cuma pas baru dibuka: animasi masuk + fokus pindah ke dalam.
+      langsung=true (dari pintasan): tanpa animasi, biar beranda nggak sempat ngintip di belakang form */
+  function gambarLembar(buka, langsung) {
     const root = $('#sheet-root'), lamaTop = root.querySelector('.sh-top');
     const gulir = !buka && lamaTop ? lamaTop.scrollTop : 0;
     const aktif = !buka && root.contains(document.activeElement) ? document.activeElement : null;
     const fid = aktif && aktif.id, sel = aktif && typeof aktif.selectionStart === 'number' ? [aktif.selectionStart, aktif.selectionEnd] : null;
-    root.innerHTML = lembar ? '<div class="sheet' + (buka ? ' buka' : '') + '" role="dialog" aria-modal="true" aria-label="' + NAMA_LEMBAR[lembar] + '">' + LEMBAR[lembar]() + '</div>' : '';
+    root.innerHTML = lembar ? '<div class="sheet' + (buka && !langsung ? ' buka' : '') + '" role="dialog" aria-modal="true" aria-label="' + NAMA_LEMBAR[lembar] + '">' + LEMBAR[lembar]() + '</div>' : '';
     document.body.classList.toggle('lock', !!lembar);
     document.body.classList.toggle('sheet-open', !!lembar);
     if (!lembar) return;
@@ -1393,7 +1394,7 @@ textarea.inp{min-height:120px;line-height:1.35}  /* 17px: di bawah 16px iPhone n
   try { const pre = salinanPre(); if (pre && hariSejak(pre.waktu) > 7) localStorage.removeItem(KEY_PRE); } catch (e) { /* abaikan */ }
   $('#app').classList.add('awal');
   render();
-  if (pintasanKeluar && db) bukaCatat();
+  if (pintasanKeluar && db) bukaCatat({ langsung: true });  // satu gambar sama beranda: layar pertama yang kelihatan udah form
   setTimeout(() => $('#app').classList.remove('awal'), 1500);
   if (db) cekPersisten(true);
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || /^(localhost|127\.0\.0\.1)$/.test(location.hostname))) {

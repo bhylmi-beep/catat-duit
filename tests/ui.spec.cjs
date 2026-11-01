@@ -103,6 +103,41 @@ async function uji(nama, fn) {
     assert.equal(new URL(page.url()).searchParams.has('aksi'), false);
     await ctx.close();
   });
+  await uji('pintasan: gambar pertama udah form, tanpa animasi masuk (beranda nggak ngintip); tombol + tetap beranimasi', async () => {
+    const { ctx, page } = await bukaHP('2026-10-29T19:40', dataContoh());
+    // skrip app jalan sebelum DOMContentLoaded: kalau form udah ada di situ, layar pertama yang digambar = form
+    await page.addInitScript(() => document.addEventListener('DOMContentLoaded', () => { window.__formDiAwal = !!document.querySelector('.sheet[aria-label="Catat transaksi"]'); }));
+    await page.goto(BASE + '?aksi=keluar#beranda');
+    await page.waitForSelector('.sheet[aria-label="Catat transaksi"]');
+    assert.equal(await page.evaluate(() => window.__formDiAwal), true);
+    assert.equal(await page.locator('.sheet').evaluate((el) => el.classList.contains('buka') || el.getAnimations().length > 0), false);
+    await page.click('[data-act="tutup"]');
+    await page.waitForSelector('.hero');
+    await page.click('[data-act="catat"]');
+    assert.equal(await page.locator('.sheet').evaluate((el) => el.classList.contains('buka')), true);
+    await ctx.close();
+  });
+  await uji('ikon pintasan: tanda + sendiri (beda dari ikon app), PNG 192px, muat di zona aman ikon bundar', async () => {
+    const manifest = JSON.parse(fs.readFileSync(path.join(ROOT, 'manifest.webmanifest'), 'utf8'));
+    const ikon = manifest.shortcuts[0].icons;
+    assert.deepEqual(ikon.map((i) => i.purpose).sort(), ['any', 'maskable']);
+    for (const i of ikon) { assert.equal(i.src, 'ikon-pintasan-keluar.png'); assert.equal(i.sizes, '192x192'); }
+    const b = fs.readFileSync(path.join(ROOT, 'ikon-pintasan-keluar.png')), N = 192;
+    assert.equal(b.toString('latin1', 1, 4), 'PNG');
+    assert.deepEqual([b.readUInt32BE(16), b.readUInt32BE(20)], [N, N]);
+    assert.notDeepEqual(b, fs.readFileSync(path.join(ROOT, 'ikon-192.png')));
+    // buka piksel (RGB, filter 0 — bikinan tools/ikon.py): semua putih harus di dalam lingkaran radius 40% (zona aman maskable)
+    const idat = [];
+    for (let o = 8; o < b.length;) { const n = b.readUInt32BE(o); if (b.toString('latin1', o + 4, o + 8) === 'IDAT') idat.push(b.subarray(o + 8, o + 8 + n)); o += 12 + n; }
+    const raw = require('node:zlib').inflateSync(Buffer.concat(idat));
+    let putih = 0, putihLuar = 0;
+    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+      const p = y * (N * 3 + 1) + 1 + x * 3;
+      if (raw[p] > 200 && raw[p + 1] > 200 && raw[p + 2] > 200) { putih++; if (Math.hypot(x + 0.5 - N / 2, y + 0.5 - N / 2) > 0.4 * N) putihLuar++; }
+    }
+    assert.ok(putih > 1000, 'tanda + kelihatan');
+    assert.equal(putihLuar, 0);
+  });
 
   console.log('Pertama kali dibuka');
   await uji('onboarding 3 langkah: tanggal 25, kategori bawaan, budget + "udah kepakai"', async () => {
